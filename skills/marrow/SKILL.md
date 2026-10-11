@@ -41,7 +41,16 @@ Show the owner these steps. The owner runs them in their own terminal; run a set
 
 **Cursor:** use the Marrow plugin from Cursor's plugin marketplace (Settings → Plugins). No account or key is needed to install; restart Cursor afterwards.
 
-**Codex, Gemini CLI, Windsurf, Cline, Grok** (and Cursor without the plugin):
+**Codex:** use the Marrow Codex plugin. Install one of the two, never both (both name their MCP server `marrow`): `marrow` holds protected actions with hooks, `marrow-advisory` has no hooks and holds nothing. No account or key is needed to install:
+
+```bash
+codex plugin marketplace add getmarrow/plugins
+codex plugin add marrow@getmarrow
+```
+
+Start a new Codex session, then review and trust the Marrow hooks in `/hooks`; Codex does not run plugin hooks until they are trusted. The installer's Codex hooks are not accepted by Codex, so do not send Codex users to the installer for protection, and do not run the installer's activate command for Codex.
+
+**Gemini CLI, Windsurf, Cline, Grok** (and Cursor without the plugin):
 
 1. Create an agent key at https://getmarrow.ai.
 2. In the project's terminal: `MARROW_API_KEY=<your_key> npx -y @getmarrow/install@latest activate`. It detects the hosts, writes Marrow's hooks and MCP configuration, keeps the owner's other settings, and runs a self-test. Without a key it stops before writing anything.
@@ -56,10 +65,10 @@ mkdir -p ~/.marrow && chmod 700 ~/.marrow
 chmod 600 ~/.marrow/env
 ```
 
-With the Claude Code or Cursor plugin installed, the plugin needs only that key file (or `MARROW_API_KEY`), then a reload or restart. Do not run step 2 for that host in the same project, even when a Marrow message says to run the installer activate command: step 2 writes a second copy of the hooks, which then run twice next to the plugin's. If both are there, the owner chooses which copy to keep.
+With the Claude Code, Cursor or Codex plugin installed, the plugin needs only that key file (or `MARROW_API_KEY`), then a reload or restart. Do not run step 2 for that host in the same project, even when a Marrow message says to run the installer activate command: step 2 writes a second copy of the hooks, which then run twice next to the plugin's. If both are there, the owner chooses which copy to keep.
 
 ## Updates and removal
 
 Packages never update themselves. When Marrow returns a `client_update` notice, tell the operator and give its exact update and verification commands. Run them only when the owner asks.
 
-To remove Marrow from a project: `npx -y @getmarrow/install@0.1.69 uninstall` previews what would be removed; add `--yes` to remove Marrow's own entries. The owner's other hooks and settings stay. Restart the hosts afterwards. In Claude Code with the plugin: `claude plugin uninstall marrow@getmarrow`. In Cursor with the plugin: uninstall it in Settings → Plugins, then `rm -rf ~/.marrow/cursor-plugin`.
+To remove Marrow from a project: `npx -y @getmarrow/install@0.1.69 uninstall` previews what would be removed; add `--yes` to remove Marrow's own entries. The owner's other hooks and settings stay. Restart the hosts afterwards. In Claude Code with the plugin: `claude plugin uninstall marrow@getmarrow`. In Cursor with the plugin: uninstall it in Settings → Plugins, then `rm -rf ~/.marrow/cursor-plugin`. In Codex with the plugin: `codex plugin remove marrow@getmarrow` (or `marrow-advisory@getmarrow`), then `rm -rf ~/.codex/plugins/data/marrow-getmarrow`, which holds the plugin's package copy.

@@ -1,6 +1,6 @@
 'use strict';
 // Checks every skill against the Agent Skills format and the release pins. No network, no writes.
-//   node tools/check.cjs [path/to/marrow-install/package.json]
+//   node tools/check.cjs [path/to/marrow-install/package.json] [path/to/marrow-mcp/package.json]
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
@@ -78,6 +78,20 @@ check('pinned @getmarrow/install version equals the release', () => {
       assert.strictEqual(m[1], version, `${path.relative(repo, file)} pins ${m[1]}`);
     }
   }
+});
+
+check('Codex is sent to the Codex plugin, not to the installer', () => {
+  const skill = fs.readFileSync(path.join(skillsDir, 'marrow', 'SKILL.md'), 'utf8');
+  const hosts = fs.readFileSync(path.join(skillsDir, 'marrow', 'references', 'hosts.md'), 'utf8');
+  for (const [label, text] of [['SKILL.md', skill], ['hosts.md', hosts]]) {
+    assert.ok(text.includes('codex plugin add marrow@getmarrow'), `${label} lacks the Codex plugin install command`);
+    assert.ok(/install one, not both|one of the two, never both/.test(text), `${label} lacks "install one, not both"`);
+  }
+  assert.ok(skill.includes('rm -rf ~/.codex/plugins/data/marrow-getmarrow'), 'SKILL.md lacks the Codex removal step');
+  assert.ok(!/\*\*Codex, /.test(skill), 'Codex is listed with the installer hosts');
+  const mcp = /mcp-package: "@getmarrow\/mcp@(\d+\.\d+\.\d+)"/.exec(skill);
+  assert.ok(mcp, 'mcp-package pin missing');
+  if (process.argv[3]) assert.strictEqual(mcp[1], JSON.parse(fs.readFileSync(path.resolve(process.argv[3]), 'utf8')).version, 'mcp-package differs from the MCP release');
 });
 
 check('no secret-looking values in the repository', () => {
