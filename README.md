@@ -18,13 +18,15 @@ The `skills` CLI is a third-party tool with its own anonymous usage telemetry. S
 | --- | --- |
 | [`marrow`](skills/marrow/SKILL.md) | When to call Marrow, how holds and approvals work, the setup steps for each host (shown to the owner, run by the owner), and the update and removal commands |
 
-A skill is instructions only. It does not install hooks, an MCP server or packages. Marrow's hooks come from `npx -y @getmarrow/install@0.1.68`, which the owner runs in a terminal; in Claude Code, use the plugin instead:
+A skill is instructions only. It does not install hooks, an MCP server or packages. Marrow's hooks come from `MARROW_API_KEY=<your_key> npx -y @getmarrow/install@latest activate`, which the owner runs in a terminal; in Claude Code and Cursor, use the plugin instead:
 
 ```text
 /plugin marketplace add getmarrow/plugins
 /plugin install marrow@getmarrow
 ```
 
+That is Claude Code. In Cursor, install Marrow from Settings → Plugins.
+
 ## Versions
 
-The skill names exact package versions (`@getmarrow/install@0.1.68`, which pins `@getmarrow/mcp` 3.9.100). They change only in a reviewed release of this repository, together with the `@getmarrow/install` release. Run `node tools/check.cjs` before a release.
+Setup and verification use the canonical `@getmarrow/install@latest activate` and `doctor` commands. The wrapper and uninstall commands name an exact version (`@getmarrow/install@0.1.69`, which pins `@getmarrow/mcp` 3.9.101). They change only in a reviewed release of this repository, together with the `@getmarrow/install` release. Run `node tools/check.cjs` before a release.

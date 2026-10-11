@@ -45,11 +45,22 @@ for (const name of skills) {
     assert.strictEqual(fields['allowed-tools'], undefined, 'skills pre-approve no tools');
     assert.ok(text.split('\n').length < 500, 'SKILL.md under 500 lines');
   });
-  check(`${name}: package commands are pinned`, () => {
-    assert.ok(!/@latest\b/.test(text), 'names @latest');
-    for (const m of text.matchAll(/npx -y (@getmarrow\/[a-z-]+)(@[^\s`]+)?/g)) {
+  // The canonical owner commands (Bob, 2026-10-11) are the only @latest forms allowed: installer
+  // `activate` with the key placeholder, and `doctor`. Every other package command names an exact version.
+  const CANONICAL = ['MARROW_API_KEY=<your_key> npx -y @getmarrow/install@latest activate', 'npx -y @getmarrow/install@latest doctor'];
+  check(`${name}: package commands are pinned or canonical`, () => {
+    for (const m of text.matchAll(/(?:MARROW_API_KEY=\S+ )?npx -y (@getmarrow\/[a-z-]+)(@[^\s`]+)?(?: ([a-z-]+))?/g)) {
+      if (m[2] === '@latest') {
+        assert.ok(!/^\s+-/.test(text.slice(m.index + m[0].length)), `${m[0]} takes no extra flags`);
+        assert.ok(CANONICAL.includes(m[0]) || (m[0] === 'npx -y @getmarrow/install@latest activate' && text.includes(`MARROW_API_KEY=<your_key> ${m[0]}`)),
+          `${m[0]} is @latest outside the canonical activate and doctor commands`);
+        continue;
+      }
       assert.ok(m[2] && /^@\d+\.\d+\.\d+$/.test(m[2]), `${m[0]} is not pinned to an exact version`);
     }
+    const latest = text.match(/@latest\b/g) || [];
+    const allowed = CANONICAL.reduce((n, c) => n + text.split(c).length - 1, 0) + (text.match(/`npx -y @getmarrow\/install@latest activate`/g) || []).length;
+    assert.strictEqual(latest.length, allowed, 'names @latest outside the canonical commands');
   });
   check(`${name}: links resolve inside the skill`, () => {
     for (const m of text.matchAll(/\]\(((?!https?:)[^)]+)\)/g)) {
