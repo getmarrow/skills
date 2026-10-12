@@ -29,4 +29,4 @@ That is Claude Code. In Cursor, install Marrow from Settings → Plugins.
 
 ## Versions
 
-Setup and verification use the canonical `@getmarrow/install@latest activate` and `doctor` commands. The wrapper and uninstall commands name an exact version (`@getmarrow/install@0.1.69`, which pins `@getmarrow/mcp` 3.9.101). They change only in a reviewed release of this repository, together with the `@getmarrow/install` release. Run `node tools/check.cjs` before a release.
+Setup and verification use the canonical `@getmarrow/install@latest activate` and `doctor` commands. The wrapper and uninstall commands name an exact version (`@getmarrow/install@0.1.70`, which pins `@getmarrow/mcp` 3.9.102). They change only in a reviewed release of this repository, together with the `@getmarrow/install` release. Run `node tools/check.cjs` before a release.
